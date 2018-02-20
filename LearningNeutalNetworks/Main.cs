@@ -9,8 +9,21 @@ using System.Windows.Forms;
 
 namespace LearningNeutalNetworks
 {
+    struct TrainingData
+    {
+        public float[] inputs;
+        public float[] awnser;
+
+        public TrainingData(float[] _inputs, float[] _awnser)
+        {
+            inputs = _inputs;
+            awnser = _awnser;
+        }
+    }
+
     class Main : Form
     {
+
         public Main() : base()
         {
             Text = "NN";
@@ -19,15 +32,39 @@ namespace LearningNeutalNetworks
             BackColor = System.Drawing.Color.White;
 
             NeuralNetwork nn = new NeuralNetwork(2, 2, 1);
-            float[] inputs = { 1, 2 };
-            float[] outputs = nn.feedForward(inputs);
 
-            for (int i = 0; i < outputs.Length; i++)
+            TrainingData[] data = {
+                new TrainingData(new float[]{ 0, 1 },new float[]{ 1 }),
+                new TrainingData(new float[]{ 1, 0 },new float[]{ 1 }),
+                new TrainingData(new float[]{ 0, 0 },new float[]{ 0 }),
+                new TrainingData(new float[]{ 1, 1 },new float[]{ 0 })
+            };
+
+            //float[] outputs = nn.feedForward(inputs);
+
+            int[] count = new int[4];
+
+            for (int i = 0; i < 50000; i++)
             {
-                Console.WriteLine(outputs[i]);
+                int index = Program.rnd.Next(4);
+                count[index]++;
+                nn.train(data[index].inputs, data[index].awnser);
             }
 
-            nn.print();
+            float[] outputs1 = nn.feedForward(new float[] { 0, 1 });
+            float[] outputs2 = nn.feedForward(new float[] { 1, 0 });
+            float[] outputs3 = nn.feedForward(new float[] { 0, 0 });
+            float[] outputs4 = nn.feedForward(new float[] { 1, 1 });
+
+            Console.WriteLine(outputs1[0]);
+            Console.WriteLine(outputs2[0]);
+            Console.WriteLine(outputs3[0]);
+            Console.WriteLine(outputs4[0]);
+
+            Console.WriteLine(count[0]);
+            Console.WriteLine(count[1]);
+            Console.WriteLine(count[2]);
+            Console.WriteLine(count[3]);
         }
 
 
