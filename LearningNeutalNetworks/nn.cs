@@ -15,6 +15,8 @@ namespace LearningNeutalNetworks
         private Matrix bias_h;
         private Matrix bias_o;
 
+        private float learningRate = 0.1F;
+
         public NeuralNetwork(int numI, int numH, int numO)
         {
             inputNodes = numI;
@@ -47,11 +49,39 @@ namespace LearningNeutalNetworks
 
         public void train(float[] inputs, float[] awnsers)
         {
-            float[] outputs = feedForward(inputs);
+            Matrix hidden = Matrix.multiply(weights_ih, Matrix.fromArray(inputs));
+            hidden.add(bias_h);
+            hidden.map(sigmoid);
 
-            Matrix outputErrors = Matrix.subtract(Matrix.fromArray(awnsers), Matrix.fromArray(outputs));
+            Matrix output = Matrix.multiply(weights_ho, hidden);
+            output.add(bias_o);
+            output.map(sigmoid);
+
+            //Calc changes needed for hidden - output
+            Matrix outputErrors = Matrix.subtract(Matrix.fromArray(awnsers), output);
+            
+            Matrix output_gradients = Matrix.map(output, dsigmoid);
+            output_gradients.multiply(outputErrors);
+            output_gradients.multiply(learningRate);
+            
+            Matrix hidden_T = Matrix.transpose(hidden);
+            Matrix weight_ho_deltas = Matrix.multiply(output_gradients, hidden_T);
+
+            weights_ho.add(weight_ho_deltas);
+            bias_o.add(output_gradients);
+
+            //Calc changes needed for input - hidden
             Matrix hiddenErrors = Matrix.multiply(Matrix.transpose(weights_ho), outputErrors);
 
+            Matrix hidden_gradients = Matrix.map(hidden, dsigmoid);
+            hidden_gradients.multiply(hiddenErrors);
+            hidden_gradients.multiply(learningRate);
+
+            Matrix inputs_T = Matrix.transpose(Matrix.fromArray(inputs));
+            Matrix weight_ih_deltas = Matrix.multiply(hidden_gradients, inputs_T);
+
+            weights_ih.add(weight_ih_deltas);
+            bias_h.add(hidden_gradients);
         }
 
         public void print()
@@ -70,6 +100,11 @@ namespace LearningNeutalNetworks
         public float sigmoid(float x)
         {
             return (float)(1 / (1 + Math.Exp(-x)));
+        }
+
+        public float dsigmoid(float y)
+        {
+            return 1 - y;
         }
     }
 }

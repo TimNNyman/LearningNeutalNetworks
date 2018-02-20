@@ -146,7 +146,7 @@ namespace LearningNeutalNetworks
             }
         }
 
-        public void multiply(int n)
+        public void multiply(float n)
         {
             for (int i = 0; i < this.Rows; i++)
             {
