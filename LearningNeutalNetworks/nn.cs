@@ -35,7 +35,7 @@ namespace LearningNeutalNetworks
 
         public float[] feedForward(float[] input)
         {
-            Matrix hidden = Matrix.multiply(weights_ih, Matrix.fromArray( input));
+            Matrix hidden = Matrix.multiply(weights_ih, Matrix.fromArray(input));
             hidden.add(bias_h);
             hidden.map(sigmoid);
 
@@ -45,8 +45,12 @@ namespace LearningNeutalNetworks
             return output.toArray();
         }
 
-        public void train(float[] input, float[] awnser)
+        public void train(float[] inputs, float[] awnsers)
         {
+            float[] outputs = feedForward(inputs);
+
+            Matrix outputErrors = Matrix.subtract(Matrix.fromArray(awnsers), Matrix.fromArray(outputs));
+            Matrix hiddenErrors = Matrix.multiply(Matrix.transpose(weights_ho), outputErrors);
 
         }
 

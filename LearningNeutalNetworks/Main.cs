@@ -18,7 +18,7 @@ namespace LearningNeutalNetworks
             Height = 400;
             BackColor = System.Drawing.Color.White;
 
-            NeuralNetwork nn = new NeuralNetwork(2, 5, 3);
+            NeuralNetwork nn = new NeuralNetwork(2, 2, 1);
             float[] inputs = { 1, 2 };
             float[] outputs = nn.feedForward(inputs);
 
