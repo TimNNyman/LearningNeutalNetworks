@@ -47,7 +47,7 @@ namespace LearningNeutalNetworks
 
             int[] count = new int[data.Length];
 
-            for (int i = 0; i < 50000; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 int index = Program.rnd.Next(data.Length);
                 count[index]++;
@@ -56,7 +56,7 @@ namespace LearningNeutalNetworks
 
             for (int i = 0; i < data.Length; i++)
             {
-                Console.WriteLine(nn.feedForward(data[i].inputs)[0] + " Expected: " + data[i].awnser[0]);
+                Console.WriteLine(nn.feedForward(data[i].inputs)[0] + " Expected: " + data[i].awnser[0] + " Error: " + (Math.Abs(nn.feedForward(data[i].inputs)[0] - data[i].awnser[0])));
             }
 
             for (int i = 0; i < count.Length; i++)
