@@ -50,12 +50,9 @@
     </Compile>
     <Compile Include="Matrix.cs" />
     <Compile Include="nn.cs" />
-    <Compile Include="PointArea.cs" />
-    <Compile Include="Precepton.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Renderer.cs" />
-    <Compile Include="Traning.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
