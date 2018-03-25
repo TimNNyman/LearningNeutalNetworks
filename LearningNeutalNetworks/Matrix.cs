@@ -115,7 +115,7 @@ namespace LearningNeutalNetworks
             if (a.Cols != b.Rows)
             {
                 //console.log('Columns of A must match rows of B.')
-                return null;
+                throw new Exception();
             }
 
             Matrix result = new Matrix(a.Rows, b.Cols);

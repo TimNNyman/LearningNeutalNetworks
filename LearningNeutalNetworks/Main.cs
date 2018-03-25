@@ -31,7 +31,7 @@ namespace LearningNeutalNetworks
             Height = 400;
             BackColor = System.Drawing.Color.White;
 
-            NeuralNetwork nn = new NeuralNetwork(3, 5, 1);
+            NeuralNetwork nn = new NeuralNetwork(new int[]{ 3, 5, 1 });
 
             TrainingData[] data = {
                 new TrainingData(new float[]{ 0, 0, 0 },new float[]{ 1 }),
@@ -47,7 +47,7 @@ namespace LearningNeutalNetworks
 
             int[] count = new int[data.Length];
 
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 50000; i++)
             {
                 int index = Program.rnd.Next(data.Length);
                 count[index]++;
@@ -56,13 +56,26 @@ namespace LearningNeutalNetworks
 
             for (int i = 0; i < data.Length; i++)
             {
-                Console.WriteLine(nn.feedForward(data[i].inputs)[0] + " Expected: " + data[i].awnser[0] + " Error: " + (Math.Abs(nn.feedForward(data[i].inputs)[0] - data[i].awnser[0])));
+                float error = (Math.Abs(nn.feedForward(data[i].inputs)[0] - data[i].awnser[0]));
+                Console.WriteLine(nn.feedForward(data[i].inputs)[0] + " Expected: " + data[i].awnser[0] + " Error: " + error +" \t" + (error < 0.1f ? "OK" : "--NOT OK--"));
             }
 
             for (int i = 0; i < count.Length; i++)
             {
                 Console.WriteLine(count[i]);
             }
+        }
+
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // Main
+            // 
+            this.ClientSize = new System.Drawing.Size(120, 67);
+            this.Name = "Main";
+            this.ResumeLayout(false);
+
         }
     }
 }

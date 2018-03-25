@@ -8,46 +8,107 @@ namespace LearningNeutalNetworks
 {
     class NeuralNetwork
     {
-        private int inputNodes, hiddenNodes, outputNodes;
-        private Matrix weights_ih;
-        private Matrix weights_ho;
+        private int[] nodes;
+        private Matrix[] weights;
+        private Matrix[] bias;
 
-        private Matrix bias_h;
-        private Matrix bias_o;
+        private float learningRate = 0.05F;
 
-        private float learningRate = 0.1F;
-
-        public NeuralNetwork(int numI, int numH, int numO)
+        public NeuralNetwork(int[] layers)
         {
-            inputNodes = numI;
-            hiddenNodes = numH;
-            outputNodes = numO;
+            nodes = new int[layers.Length];
+            for (int i = 0; i < layers.Length; i++)
+            {
+                nodes[i] = layers[i];
+            }
 
-            weights_ih = new Matrix(hiddenNodes, inputNodes);
-            weights_ho = new Matrix(outputNodes, hiddenNodes);
-            bias_h = new Matrix(hiddenNodes, 1);
-            bias_o = new Matrix(outputNodes, 1);
+            weights = new Matrix[nodes.Length - 1];
+            bias = new Matrix[nodes.Length - 1];
+            for (int i = 0; i < nodes.Length - 1; i++)
+            {
+                weights[i] = new Matrix(nodes[i + 1], nodes[i]);
+                bias[i] = new Matrix(nodes[i + 1], 1);
 
-            weights_ih.randomize();
-            weights_ho.randomize();
-            bias_h.randomize();
-            bias_o.randomize();
-
+                weights[i].randomize();
+                bias[i].randomize();
+            }
         }
 
         public float[] feedForward(float[] input)
         {
-            Matrix hidden = Matrix.multiply(weights_ih, Matrix.fromArray(input));
-            hidden.add(bias_h);
-            hidden.map(sigmoid);
+            Matrix matrix = Matrix.fromArray(input);
 
-            Matrix output = Matrix.multiply(weights_ho, hidden);
-            output.add(bias_o);
-            output.map(sigmoid);
-            return output.toArray();
+            for (int i = 0; i < weights.Length; i++)
+            {
+                matrix = Matrix.multiply(weights[i], matrix);
+                matrix.add(bias[i]);
+                matrix.map(sigmoid);
+            }
+
+            return matrix.toArray();
         }
 
         public void train(float[] inputs, float[] awnsers)
+        {
+            Matrix[] results = new Matrix[weights.Length + 1];
+            results[0] = Matrix.fromArray(inputs);
+
+            for (int i = 0; i < weights.Length; i++)
+            {
+                Matrix result = Matrix.multiply(weights[i], results[i]);
+                result.add(bias[i]);
+                result.map(sigmoid);
+                results[i + 1] = result;
+            }
+
+            //Backpropegation
+            Matrix[] errors = new Matrix[results.Length];
+            errors[results.Length - 1] = results[results.Length - 1];
+            for (int i = weights.Length; i > 0; i--)
+            {
+                if(i == weights.Length)
+                    errors[i - 1] = Matrix.subtract(Matrix.fromArray(awnsers), errors[i]);
+                else
+                    errors[i - 1] = Matrix.multiply(Matrix.transpose(weights[i]), errors[i]);
+
+                Matrix gradients = Matrix.map(results[i], dsigmoid);
+                gradients.multiply(errors[i - 1]);
+                gradients.multiply(learningRate);
+
+                Matrix deltas = Matrix.multiply(gradients, Matrix.transpose(results[i - 1]));
+
+                weights[i - 1].add(deltas);
+                bias[i - 1].add(gradients);
+            }
+        }
+
+        public void print()
+        {
+            for (int i = 0; i < weights.Length; i++)
+            {
+                weights[i].print();
+                Console.WriteLine();
+                bias[i].print();
+                Console.WriteLine();
+                Console.WriteLine();
+            }
+        }
+
+        public float sigmoid(float x)
+        {
+            return (float)(1 / (1 + Math.Exp(-x)));
+        }
+
+        public float dsigmoid(float y)
+        {
+            return 1 - y;
+        }
+    }
+}
+
+
+/* Old
+ * public void train(float[] inputs, float[] awnsers)
         {
             Matrix hidden = Matrix.multiply(weights_ih, Matrix.fromArray(inputs));
             hidden.add(bias_h);
@@ -83,28 +144,4 @@ namespace LearningNeutalNetworks
             weights_ih.add(weight_ih_deltas);
             bias_h.add(hidden_gradients);
         }
-
-        public void print()
-        {
-            weights_ih.print();
-            Console.WriteLine();
-            bias_h.print();
-            Console.WriteLine();
-            Console.WriteLine();
-            weights_ho.print();
-            Console.WriteLine();
-            bias_o.print();
-            Console.WriteLine();
-        }
-
-        public float sigmoid(float x)
-        {
-            return (float)(1 / (1 + Math.Exp(-x)));
-        }
-
-        public float dsigmoid(float y)
-        {
-            return 1 - y;
-        }
-    }
-}
+ */
